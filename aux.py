@@ -105,3 +105,5 @@ def criarCSV(buffer, name_model, name_bd):
     csv_file = f'{name_model}_{name_bd}_resultados.csv'
     df.to_csv(csv_file, index=False)
     
+
+

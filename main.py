@@ -3,7 +3,7 @@ import model as m
 import time as t
 import aux as a
 window_size=100
-
+import ensemble as e
 
 dataset, name_bd= a.escolha_BD()
 
@@ -93,58 +93,113 @@ models={
     "ensemble_VotingClassifier": model_VC,
     "forest_AMFClassifier": model_AMFC
 }
+while(1):
+    opcao= input("Digite a opcao que deseja criar:\n1-Classificadores indepedentes\n2-Ensemble Voting\n3-Ensemble BWM\n4-Ensemble BM\n5-Ensemble MP\n6-threshold\n")
+    if(opcao=='1'):
+        #for model in models.values():
+        for model_name, model in models.items():
+            buffer=[]
+            metrics_dict=metrics_dict
 
-#for model in models.values():
-for model_name, model in models.items():
-    buffer=[]
-    metrics_dict=metrics_dict
-
-    Round, Timestamp, Time2predict, Time2learn=0,0,0,0
-   
-    t_start_time_Timestamp=t.time()
-    for x, y in dataset:
-        start_time_Timestamp=t.time()
-        Round+=1
         
-        start_time_predict = t.time()
-        y_pred = model.predict_one(x)
-        end_time_predict = t.time()
-        Time2predict= a.calTime(start_time_predict, end_time_predict)
+            t_start_time_Timestamp=t.time()
+            for x, y in dataset:
+                start_time_Timestamp=t.time()
+                Round+=1
+                
+                start_time_predict = t.time()
+                y_pred = model.predict_one(x)
+                #print(f'y_pred:{y_pred}')
+                end_time_predict = t.time()
+                Time2predict= a.calTime(start_time_predict, end_time_predict)
 
-        if y_pred is not None:
-            for metric in metrics_dict.values():
-                metric.update(y_true=y, y_pred=y_pred)
+                if y_pred is not None:
+                    for metric in metrics_dict.values():
+                        metric.update(y_true=y, y_pred=y_pred)
 
-        start_time_learn = t.time()
-        model.learn_one(x, y)
-        end_time_learn = t.time()
-        Time2learn= a.calTime(start_time_learn, end_time_learn)
+                start_time_learn = t.time()
+                model.learn_one(x, y)
+                end_time_learn = t.time()
+                Time2learn= a.calTime(start_time_learn, end_time_learn)
 
-        end_time_Timestamp=t.time()
-        Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+                end_time_Timestamp=t.time()
+                Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
 
-        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
+                metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
+                buffer.append(metrics_data)
+                #metrics_data = {'Round': Round, 
+                #               'Timestamp': Timestamp, 
+                #               'Time2predict': Time2predict, 
+                #               'Time2learn': Time2learn
+                #               }
+                #buffer.append(metrics_data)
+                #print(buffer)
+                #for metric_name, metric in metrics_dict.items():
+                #    metrics_data[metric_name] = metric.get()
+
+                #buffer.append(metrics_data)
+                #print(metrics_data)
+
+
+            t_end_time_Timestamp=t.time()
+            Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+            Round+=1
+            metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+            buffer.append(metrics_data)
+            print(buffer)
+            a.criarCSV(buffer,model_name, name_bd)
+        # result_dict = {metric_name: metric.get() for metric_name, metric in metrics_dict.items()}
+        # print(result_dict)
+    elif(opcao=='2'):
+        buffer=[]
+        metrics_dict=metrics_dict
+        Round, Timestamp, Time2predict, Time2learn=0,0,0,0
+        estimators=e.createList(models, metrics_dict)
+        model_name='ensemble_voting'
+        #print(estimators)
+        Round=0
+        t_start_time_Timestamp=t.time()
+        for x, y in dataset:
+             start_time_Timestamp=t.time()
+             Round+=1 
+             start_time_predict = t.time()
+             estimators_y_pred=e.ensemble_predict_one(estimators,x,opcao,y)
+             #print(estimators_y_pred)
+             end_time_predict = t.time()
+             Time2predict= a.calTime(start_time_predict, end_time_predict)
+
+             if estimators_y_pred is not None:
+                for metric in metrics_dict.values():
+                    metric.update(y_true=y, y_pred=estimators_y_pred)
+
+             start_time_learn = t.time()
+             e.ensemble_learn_one(estimators, x, y)
+             end_time_learn = t.time()
+             Time2learn= a.calTime(start_time_learn, end_time_learn)
+            
+
+             end_time_Timestamp=t.time()
+             Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+
+             metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
+             buffer.append(metrics_data)
+
+        
+        t_end_time_Timestamp=t.time()
+        Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+        Round+=1
+        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
         buffer.append(metrics_data)
-        #metrics_data = {'Round': Round, 
-        #               'Timestamp': Timestamp, 
-        #               'Time2predict': Time2predict, 
-        #               'Time2learn': Time2learn
-        #               }
-        #buffer.append(metrics_data)
-        #print(buffer)
-        #for metric_name, metric in metrics_dict.items():
-        #    metrics_data[metric_name] = metric.get()
-
-        #buffer.append(metrics_data)
-        #print(metrics_data)
-
-
-    t_end_time_Timestamp=t.time()
-    Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
-    Round+=1
-    metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
-    buffer.append(metrics_data)
-    print(buffer)
-    a.criarCSV(buffer,model_name, name_bd)
-   # result_dict = {metric_name: metric.get() for metric_name, metric in metrics_dict.items()}
-   # print(result_dict)
+        print(buffer)
+        a.criarCSV(buffer,model_name, name_bd)
+    elif(opcao=='3'):
+        pass
+    elif(opcao=='4'):
+        pass
+    elif(opcao=='5'):
+        pass
+    elif(opcao=='6'):
+        pass    
+    else:
+        print('[ERRO] Opcao invalida!')
+            
