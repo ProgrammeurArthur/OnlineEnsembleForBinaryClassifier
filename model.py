@@ -549,7 +549,7 @@ def ensemble_BaggingClassifier(dataset):
         model |= preprocessing.StandardScaler()
         model = ensemble.BaggingClassifier(
         model=(
-            feature_extraction.TFIDF(on='body')  |
+            #feature_extraction.TFIDF(on='body')  |
             preprocessing.StandardScaler() |
             linear_model.LogisticRegression()
         ),

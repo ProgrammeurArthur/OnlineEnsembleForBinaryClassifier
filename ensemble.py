@@ -34,7 +34,11 @@ def ensemble_predict_one( estimators,x, opcao,y):
             elif false_count > true_count:
                 return False
         case '3':
-            pass
+            for model in estimators:
+                print(f"{model.get_name()} - RollingAccuracy: {model.get_metrics()['RollingAccuracy'].get()}")
+            #RollingAccuracy
+            best_model = max(estimators, key=lambda model: model.get_metrics()["RollingAccuracy"].get())
+            return best_model.get_predict_ensemble(), best_model.get_name()
         case '4':
             pass
         case '5':
