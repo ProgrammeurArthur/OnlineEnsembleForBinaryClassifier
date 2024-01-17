@@ -1,9 +1,16 @@
 import model as m
 from river import  metrics as me,utils
+# def createList(models, metrics):
+#     estimators=[]
+#     for name, model in models.items():
+#         estimators.append(Model_class(name, model, metrics))
+#     return estimators
 def createList(models, metrics):
-    estimators=[]
+    estimators = []
     for name, model in models.items():
-        estimators.append(Model_class(name, model, metrics))
+        # Crie cópias independentes das métricas para cada modelo
+        model_metrics = {metric_name: metric.clone() for metric_name, metric in metrics.items()}
+        estimators.append(Model_class(name, model, model_metrics))
     return estimators
 
 
