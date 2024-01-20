@@ -94,7 +94,7 @@ models={
     "forest_AMFClassifier": model_AMFC
 }
 while(1):
-    opcao= input("Digite a opcao que deseja criar:\n1-Classificadores indepedentes\n2-Ensemble Voting\n3-Ensemble BM\n4-Ensemble BWM\n5-Ensemble MP\n6-threshold\n")
+    opcao= input("Digite a opcao que deseja criar:\n1-Classificadores indepedentes\n2-Ensemble Voting\n3-Ensemble BM\n4-Ensemble BWM\n5-threshold\n")
     if(opcao=='1'):
         #for model in models.values():
         for model_name, model in models.items():
@@ -236,9 +236,91 @@ while(1):
         #print(buffer)
         a.criarCSV(buffer,ensemble_model_name, name_bd)
     elif(opcao=='4'):
-        pass
+        buffer=[]
+        #metrics_dict=metrics_dict
+        Round, Timestamp, Time2predict, Time2learn=0,0,0,0
+        estimators=e.createList(models, metrics_dict)
+        model_name='ensemble_best_model_average'
+        ensemble_model_name='ensemble_best_model_average'
+        #print(estimators)
+        Round=0
+        t_start_time_Timestamp=t.time()
+        for x, y in dataset:
+             start_time_Timestamp=t.time()
+             Round+=1 
+             start_time_predict = t.time()
+             estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y)
+             #print(estimators_y_pred)
+             end_time_predict = t.time()
+             Time2predict= a.calTime(start_time_predict, end_time_predict)
+
+             if estimators_y_pred is not None:
+                for metric in metrics_dict.values():
+                    metric.update(y_true=y, y_pred=estimators_y_pred)
+
+             start_time_learn = t.time()
+             e.ensemble_learn_one(estimators, x, y)
+             end_time_learn = t.time()
+             Time2learn= a.calTime(start_time_learn, end_time_learn)
+            
+
+             end_time_Timestamp=t.time()
+             Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+
+             metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
+             buffer.append(metrics_data)
+
+        
+        t_end_time_Timestamp=t.time()
+        Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+        Round+=1
+        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+        buffer.append(metrics_data)
+        #print(buffer)
+        a.criarCSV(buffer,ensemble_model_name, name_bd)
     elif(opcao=='5'):
-        pass
+        buffer=[]
+        #metrics_dict=metrics_dict
+        Round, Timestamp, Time2predict, Time2learn=0,0,0,0
+        estimators=e.createList(models, metrics_dict)
+        model_name='ensemble_best_model_threshold'
+        ensemble_model_name='ensemble_best_model_threshold'
+        #print(estimators)
+        Round=0
+        t_start_time_Timestamp=t.time()
+        for x, y in dataset:
+             start_time_Timestamp=t.time()
+             Round+=1 
+             start_time_predict = t.time()
+             estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y)
+             #print(estimators_y_pred)
+             end_time_predict = t.time()
+             Time2predict= a.calTime(start_time_predict, end_time_predict)
+
+             if estimators_y_pred is not None:
+                for metric in metrics_dict.values():
+                    metric.update(y_true=y, y_pred=estimators_y_pred)
+
+             start_time_learn = t.time()
+             e.ensemble_learn_one(estimators, x, y)
+             end_time_learn = t.time()
+             Time2learn= a.calTime(start_time_learn, end_time_learn)
+            
+
+             end_time_Timestamp=t.time()
+             Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+
+             metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
+             buffer.append(metrics_data)
+
+        
+        t_end_time_Timestamp=t.time()
+        Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+        Round+=1
+        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+        buffer.append(metrics_data)
+        #print(buffer)
+        a.criarCSV(buffer,ensemble_model_name, name_bd)
     elif(opcao=='6'):
         pass    
     else:
