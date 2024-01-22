@@ -69,36 +69,36 @@ def ensemble_predict_one( estimators,x, opcao,y):
         case '6':
             pass
 
-# def func_voting(estimators):
-#     true_count =0
-#     false_count=0
-#     none_count=0
-#     for model in estimators:
-#         aux= model.get_predict_ensemble()
-#         if aux== True:
-#             true_count+=1
-#         elif aux==False:
-#             false_count +=1
-#         else:
-#             none_count+=1
-#     if true_count >= false_count:
-#         return True
-#     elif false_count > true_count:
-#         return False
+def func_voting(estimators):
+    true_count =0
+    false_count=0
+    none_count=0
+    for model in estimators:
+        aux= model.get_predict_ensemble()
+        if aux== True:
+            true_count+=1
+        elif aux==False:
+            false_count +=1
+        else:
+            none_count+=1
+    if true_count >= false_count:
+        return True
+    elif false_count > true_count:
+        return False
 
-def ensemble_stacking(models):
-    base=[]
-    for model_name, model in models.items():
-        base.append(model)
-    model=[model for model in models.values()]
-    stacking_model = compose.Pipeline(
-    ('scale', pp.StandardScaler()),
-    ('stack', ensemble.StackingClassifier(
-        model,
-        meta_classifier=lm.LogisticRegression()
-    )))
+# def ensemble_stacking(models):
+#     base=[]
+#     for model_name, model in models.items():
+#         base.append(model)
+#     model=[model for model in models.values()]
+#     stacking_model = compose.Pipeline(
+#     ('scale', pp.StandardScaler()),
+#     ('stack', ensemble.StackingClassifier(
+#         model,
+#         meta_classifier=lm.LogisticRegression()
+#     )))
 
-    return stacking_model 
+#     return stacking_model 
     
 
 
