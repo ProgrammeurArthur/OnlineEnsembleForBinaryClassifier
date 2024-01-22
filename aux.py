@@ -2,7 +2,7 @@ from river import datasets, metrics, utils
 import pandas as pd
 window_size=100
 def escolha_BD():
-    opcao= input("Digite o banco de dados que deseja:\n1-SmsSpam\n2-Bananas\n3-Elec2\n4-HTTP\n5-MaliciousURL(verificar)\n6-Phishing\n7-SMTP\n8-TREC07(verificar)\n9-Higgs\n")
+    opcao= input("Digite o banco de dados que deseja:\n1-SmsSpam\n2-Bananas\n3-CreditCard\n4-Elec2\n5-MaliciousURL(verificar)\n6-Phishing\n7-SMTP\n8-TREC07(verificar)\n9-Higgs\n10-HTTP\n")
     #databases
     #dataset=datasets.SMSSpam()
     #dataset_Bananas=datasets.Bananas()
@@ -42,6 +42,9 @@ def escolha_BD():
         case '9':
             dataset=datasets.Higgs()
             name='Higgs'
+        case '10':
+            dataset=datasets.HTTP()
+            name='HTTP'
         case _:
             print("[ERRO]Opção inválida.")
     return dataset, name
