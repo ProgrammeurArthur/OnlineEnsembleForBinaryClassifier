@@ -23,16 +23,13 @@ def model_database(dataset):
     elif isinstance(dataset, datasets.Higgs):
         model =  compose.Select('jet 1 b-tag', 'jet 1 eta','jet 1 phi','jet 1 pt','jet 2 b-tag','jet 2 eta','jet 2 phi','jet 2 pt','jet 3 b-tag','jet 3 eta','jet 3 phi','jet 3 pt','jet 4 b-tag','jet 4 eta','jet 4 phi','jet 4 pt','lepton eta','lepton pT','lepton phi', 'm_bb','m_jj','m_jjj', 'm_jlv', 'm_lv','m_wbb''m_wwbb','missing energy magnitude','missing energy phi')
     elif isinstance(dataset, datasets.MaliciousURL):
-       #verificar
-       pass
+       return None #verificar
     elif isinstance(dataset, datasets.Phishing):
         model =  compose.Select('age_of_domain','anchor_from_other_domain','empty_server_form_handler','https','ip_in_url','is_popular','long_url','popup_window','request_from_other_domain')
     elif isinstance(dataset, datasets.SMTP):
         model =  compose.Select('dst_bytes','duration','src_bytes')
     elif isinstance(dataset, datasets.TREC07):
-        #verificar
-        model =   compose.Select('body')
-        #,'date','recipients','sender','subject'
+        return None #verificar
     return model
 
 
@@ -623,16 +620,13 @@ def ensemble_SRPClassifier(dataset):
 
 def ensemble_StackingClassifier(dataset):
     model=model_database(dataset)
+    list=list_models(dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= compose.Pipeline(
         ('feature',feature_extraction.TFIDF(on='body')),
         ('scale', preprocessing.StandardScaler()),
         ('stack', ensemble.StackingClassifier(
-            [
-                linear_model.LogisticRegression(),
-                linear_model.PAClassifier(mode=1, C=0.01),
-                linear_model.PAClassifier(mode=2, C=0.01),
-            ],
+            list,
             meta_classifier=linear_model.LogisticRegression()
         ))
         )
@@ -647,11 +641,7 @@ def ensemble_StackingClassifier(dataset):
         #(#'feature',feature_extraction.TFIDF(on='body')),
         ('scale', preprocessing.StandardScaler()),
         ('stack', ensemble.StackingClassifier(
-            [
-                linear_model.LogisticRegression(),
-                linear_model.PAClassifier(mode=1, C=0.01),
-                linear_model.PAClassifier(mode=2, C=0.01),
-            ],
+            list,
             meta_classifier=linear_model.LogisticRegression()
         ))
         )
@@ -784,8 +774,8 @@ def naive_bayes_ComplementNB(dataset):
     model=model_database(dataset)
     if isinstance(dataset, datasets.SMSSpam):               
         model |= compose.Pipeline(
-            ("tfidf", feature_extraction.TFIDF(on='body')),
-            ("nb", naive_bayes.ComplementNB(alpha=1))
+            (feature_extraction.TFIDF(on='body')),
+            ( naive_bayes.ComplementNB(alpha=1))
         )
     elif isinstance(dataset, datasets.TREC07):
         #model |= (
@@ -796,7 +786,7 @@ def naive_bayes_ComplementNB(dataset):
     else:
         model |= compose.Pipeline(
             #("tfidf", feature_extraction.TFIDF(on='body')),
-            ("nb", naive_bayes.ComplementNB(alpha=1))
+            ( naive_bayes.ComplementNB())
         )
     return model
 
@@ -833,7 +823,7 @@ def naive_bayes_MultinomialNB(dataset):
         model |= compose.Pipeline(
             #("tfidf", feature_extraction.TFIDF(on='body')),
             #("tokenize", feature_extraction.BagOfWords(lowercase=False)),
-            ("nb", naive_bayes.MultinomialNB(alpha=1))
+            (naive_bayes.MultinomialNB(alpha=1))
         )
     return model
 
@@ -870,5 +860,236 @@ def neighbors_KNNClassifier(dataset):
     return model
 
 
+def list_models(dataset):
+    model1=naive_bayes.BernoulliNB()
+    
+    model3=imblearn.HardSamplingClassifier(naive_bayes.BernoulliNB(alpha=0),p=0.1,size=40,seed=42)
+    model7=linear_model.LogisticRegression(optimizer=optim.SGD(.1))
+    model8=linear_model.Perceptron()
+    #model9=multiclass.OneVsOneClassifier(linear_model.LogisticRegression())
+    model9 =tree.ExtremelyFastDecisionTreeClassifier(
+        grace_period=100,
+        split_criterion='info_gain',
+        delta=1e-5,
+        leaf_prediction='nba',
+        #nominal_attributes=['elevel', 'car', 'zipcode'],
+        min_samples_reevaluate=100
+    )
+        
+    model10=tree.HoeffdingAdaptiveTreeClassifier(
+        grace_period=100,
+        split_criterion='info_gain',
+        delta=1e-5,
+        leaf_prediction='mc',
+        nb_threshold=10,
+        seed=0
+    )
 
+    model11= tree.HoeffdingTreeClassifier(
+        grace_period=100,
+        split_criterion='info_gain',
+        delta=1e-5,
+        leaf_prediction='mc',
+        nb_threshold=10)
+
+    model12= tree.SGTClassifier(
+        feature_quantizer=tree.splitter.StaticQuantizer(
+            n_bins=32, warm_start=10
+        ))    
+    
+    model14 = ensemble.AdaBoostClassifier(
+        model=(
+            tree.HoeffdingTreeClassifier(
+                split_criterion='gini',
+                delta=1e-5,
+                grace_period=2000
+            )
+        ),
+        n_models=5,
+        seed=42)
+    
+    model15 = ensemble.BOLEClassifier(
+        model=drift.DriftRetrainingClassifier(
+            model=tree.HoeffdingTreeClassifier(),
+            drift_detector=drift.binary.DDM()
+        ),
+        n_models=10,
+        seed=42
+        )
+
+    base_model = tree.HoeffdingTreeClassifier(
+        grace_period=100,
+        split_criterion='info_gain',
+        delta=1e-5,
+        leaf_prediction='mc',
+        nb_threshold=10
+        )
+    model18 = ensemble.SRPClassifier(
+            model=base_model, n_models=3, seed=42,
+        )    
+    
+    model19= ensemble.StackingClassifier(
+            [
+                linear_model.LogisticRegression(),
+                linear_model.PAClassifier(mode=1, C=0.01),
+                linear_model.PAClassifier(mode=2, C=0.01),
+            ],
+            meta_classifier=linear_model.LogisticRegression()
+    )
+
+    # model20= ensemble.VotingClassifier([
+    #             linear_model.LogisticRegression(),
+    #             tree.HoeffdingTreeClassifier(),
+    #             naive_bayes.GaussianNB()
+    # ])
+
+    model21=forest.AMFClassifier(
+            n_estimators=10,
+            use_aggregation=True,
+            dirichlet=0.5,
+            seed=1
+        ) 
+    
+    model22=linear_model.ALMAClassifier()
+
+    model23=linear_model.PAClassifier( C=0.01,mode=1)
+
+    model24=linear_model.SoftmaxRegression()
+
+#    model25=naive_bayes.ComplementNB()
+    model25= naive_bayes.GaussianNB()
+
+    l1_dist = functools.partial(utils.math.minkowski_distance, p=1)
+    model26=neighbors.KNNClassifier(engine=neighbors.SWINN(
+                    dist_func=l1_dist,
+                    seed=42
+                )
+            )
+    #model26=naive_bayes.MultinomialNB()
+
+    if isinstance(dataset, datasets.SMSSpam):
+        model4 = imblearn.RandomOverSampler(
+        (
+            #feature_extraction.TFIDF(on='body') |
+            naive_bayes.BernoulliNB(alpha=0)
+        ),
+        desired_dist={False: 0.4, True: 0.6},
+        seed=42)
+        model5= imblearn.RandomSampler(
+        (
+            #feature_extraction.TFIDF(on='body') |
+            preprocessing.StandardScaler() |
+            naive_bayes.BernoulliNB(alpha=0)
+        ),
+        desired_dist={False: 0.4, True: 0.6},
+        sampling_rate=0.8,
+        seed=42
+        )
+        model6=imblearn.RandomUnderSampler(
+            (
+               # feature_extraction.TFIDF(on='body') |
+                preprocessing.StandardScaler() |
+                naive_bayes.BernoulliNB(alpha=0)
+            ),
+            desired_dist={False: 0.4, True: 0.6},
+            seed=42
+        )
+        model13= ensemble.ADWINBaggingClassifier(
+        model=(
+        #feature_extraction.TFIDF(on='body')  |
+        preprocessing.StandardScaler() |
+        linear_model.LogisticRegression()
+        ),
+        n_models=3,
+        seed=42
+        )
+
+        model16= ensemble.BaggingClassifier(
+        model=(
+            #feature_extraction.TFIDF(on='body')  |
+            preprocessing.StandardScaler() |
+            linear_model.LogisticRegression()
+        ),
+        n_models=3,
+        seed=42
+        )
+
+        model17 = ensemble.LeveragingBaggingClassifier(
+            model=(
+                #feature_extraction.TFIDF(on='body')  |
+                preprocessing.StandardScaler() |
+                linear_model.LogisticRegression()
+            ),
+            n_models=3,
+            seed=42
+        )
+        list_model=[model1,model3,model4, model5, model6, model7, model8, model9, model10, model11, model12, model13, model14, model15, model16
+                ,model17, model18, model19,model21,model22 ,model23, model24,model25, model26]
+        return list_model
+        
+    elif isinstance(dataset, datasets.TREC07):
+        #model |= (
+        #  feature_extraction.TFIDF(on='body') |
+        #  naive_bayes.BernoulliNB(alpha=0)
+        #)
+        pass
+    else:
+        model2=forest.ARFClassifier(seed=8, leaf_prediction="mc")
+        model4 = imblearn.RandomOverSampler(
+        (
+            preprocessing.StandardScaler() |
+            naive_bayes.BernoulliNB(alpha=0)
+        ),
+        desired_dist={False: 0.4, True: 0.6},
+        seed=42)
+        model5= imblearn.RandomSampler(
+        (
+            preprocessing.StandardScaler() |
+            naive_bayes.BernoulliNB(alpha=0)
+        ),
+        desired_dist={False: 0.4, True: 0.6},
+        sampling_rate=0.8,
+        seed=42
+        )
+        model6= imblearn.RandomUnderSampler(
+            (
+                preprocessing.StandardScaler() |
+                naive_bayes.BernoulliNB(alpha=0)
+            ),
+            desired_dist={False: 0.4, True: 0.6},
+            seed=42
+        )
+ 
+        model13 = ensemble.ADWINBaggingClassifier(
+        model=(
+        #feature_extraction.TFIDF(on='body')  |
+        preprocessing.StandardScaler() |
+        linear_model.LogisticRegression()
+        ),
+        n_models=3,
+        seed=42
+        )
+
+        model16= ensemble.BaggingClassifier(
+        model=(
+            #feature_extraction.TFIDF(on='body')  |
+            preprocessing.StandardScaler() |
+            linear_model.LogisticRegression()
+        ),
+        n_models=3,
+        seed=42
+        )
+        model17 = ensemble.LeveragingBaggingClassifier(
+            model=(
+                #feature_extraction.TFIDF(on='body')  |
+                preprocessing.StandardScaler() |
+                linear_model.LogisticRegression()
+            ),
+            n_models=3,
+            seed=42
+        )
+        
+        list_model=[model1,model2,model3,model4, model5, model6, model7, model8, model9, model10, model11, model12, model13, model14, model15, model16
+                ,model17, model18, model19,model21,model22 ,model23, model24,model25, model26]
+        return list_model
 

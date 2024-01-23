@@ -1,9 +1,12 @@
 import model as m
 from river import  metrics as me,utils
-from river import ensemble, compose
+from river import ensemble as e, compose
 from river import linear_model as lm
 from river import preprocessing as pp
-
+#rom river.base import MetaEstimatorMixin
+from river.base import Classifier
+from river import stats
+import numpy as np
 # def createList(models, metrics):
 #     estimators=[]
 #     for name, model in models.items():
@@ -62,7 +65,7 @@ def ensemble_predict_one( estimators,x, opcao,y):
             print([model.get_name() for model in selected_models])
             return func_voting(selected_models)
         case '5':
-            threshold = 0.9
+            threshold = 0.8
             selected_models = [model for model in estimators if model.get_metrics()["RollingAccuracy"].get() > threshold]
             print([model.get_name() for model in selected_models])
             return func_voting(selected_models)
@@ -86,20 +89,6 @@ def func_voting(estimators):
     elif false_count > true_count:
         return False
 
-# def ensemble_stacking(models):
-#     base=[]
-#     for model_name, model in models.items():
-#         base.append(model)
-#     model=[model for model in models.values()]
-#     stacking_model = compose.Pipeline(
-#     ('scale', pp.StandardScaler()),
-#     ('stack', ensemble.StackingClassifier(
-#         model,
-#         meta_classifier=lm.LogisticRegression()
-#     )))
-
-#     return stacking_model 
-    
 
 
 def ensemble_learn_one(estimators,x,y):
@@ -127,3 +116,5 @@ class Model_class:
 
     def get_predict_ensemble(self):
         return self.y_pred_ensemble
+
+

@@ -3,7 +3,11 @@ import model as m
 import time as t
 import aux as a
 window_size=100
-import ensemble as e
+import ensemble as e 
+#from river import ensemble
+from river.linear_model import LogisticRegression as lr
+from river.tree import HoeffdingTreeClassifier as htc
+
 
 dataset, name_bd= a.escolha_BD()
 
@@ -65,6 +69,13 @@ model_SRPC= m.ensemble_SRPClassifier(dataset)
 model_SC= m.ensemble_StackingClassifier(dataset)
 model_VC= m.ensemble_VotingClassifier(dataset)
 model_AMFC= m.forest_AMFClassifier(dataset)
+model_ALMA=m.linear_model_ALMAClassifier(dataset)
+model_PAC=m.linear_model_PAClassifier(dataset)
+model_SoftmaxRegression=m.linear_model_SoftmaxRegression(dataset)
+#model_ComplementNB=m.naive_bayes_ComplementNB(dataset)
+model_GaussianNB=m.naive_bayes_GaussianNB(dataset)
+#model_MultinomialNB=m.naive_bayes_MultinomialNB(dataset)
+model_KNNClassifier=m.neighbors_KNNClassifier(dataset)
 
 models={
     "BernoulliNB": model_B,
@@ -91,10 +102,18 @@ models={
     "ensemble_SRPClassifier": model_SRPC,
     "ensemble_StackingClassifier": model_SC,
     "ensemble_VotingClassifier": model_VC,
-    "forest_AMFClassifier": model_AMFC
+    "forest_AMFClassifier": model_AMFC,
+    "model_linear_ALMAClassifier":model_ALMA,
+    "linear_model_PAClassifier":model_PAC,
+    "linear_model_SoftmaxRegression":model_SoftmaxRegression,
+#    "model_ComplementNB":model_ComplementNB,
+    "model_GaussianNB":model_GaussianNB,
+#    "model_MultinomialNB":model_MultinomialNB,
+    "model_KNNClassifier":model_KNNClassifier
+
 }
 while(1):
-    opcao= input("Digite a opcao que deseja criar:\n1-Classificadores indepedentes\n2-Ensemble Voting\n3-Ensemble BM\n4-Ensemble BWM\n5-threshold\n6-Ensemble Stacking\n")
+    opcao= input("Digite a opcao que deseja criar:\n1-Classificadores indepedentes\n2-Ensemble Voting\n3-Ensemble BM\n4-Ensemble BWM\n5-threshold\n")
     if(opcao=='1'):
         #for model in models.values():
         for model_name, model in models.items():
@@ -322,52 +341,6 @@ while(1):
         buffer.append(metrics_data)
         #print(buffer)
         a.criarCSV(buffer,ensemble_model_name, name_bd)
-    elif(opcao=='6'):
-        # buffer=[]
-        # metrics_dict=metrics_dict
-        # Round, Timestamp, Time2predict, Time2learn=0,0,0,0
-        # #estimators=e.createList(models, metrics_dict)
-        # #model=e.ensemble_stacking(models)
-        # model=e.adaboost_classifier(models)
-        # model_name='ensemble_adaboost'
-        # #print(estimators)
-        # Round=0
-        # t_start_time_Timestamp=t.time()
-        # for x, y in dataset:
-        #     start_time_Timestamp=t.time()
-        #     Round+=1
-                
-        #     start_time_predict = t.time()
-        #     y_pred = model.predict_one(x)
-        #     #print(f'y_pred:{y_pred}')
-        #     end_time_predict = t.time()
-        #     Time2predict= a.calTime(start_time_predict, end_time_predict)
-
-        #     if y_pred is not None:
-        #         for metric in metrics_dict.values():
-        #             metric.update(y_true=y, y_pred=y_pred)
-
-        #     start_time_learn = t.time()
-        #     model.learn_one(x, y)
-        #     end_time_learn = t.time()
-        #     Time2learn= a.calTime(start_time_learn, end_time_learn)
-
-        #     end_time_Timestamp=t.time()
-        #     Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
-
-        #     metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
-        #     buffer.append(metrics_data)
-           
-
-
-        # t_end_time_Timestamp=t.time()
-        # Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
-        # Round+=1
-        # metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
-        # buffer.append(metrics_data)
-        # print(buffer)
-        # a.criarCSV(buffer,model_name, name_bd)
-        pass
     else:
         print('[ERRO] Opcao invalida!')
             
