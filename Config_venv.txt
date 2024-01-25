@@ -6,15 +6,6 @@
 	source venv/bin/activate
 # install the packets
 	pip install -r requirements.txt
-	
-
-# How to use GPU and cuda
-	Install libraries
-		numba, cuda-python
-	Launch a terminal shell and type the commands:
-		export NUMBA_ENABLE_CUDASIM=1
-https://nyu-cds.github.io/python-numba/05-cuda/
-
 
 # ipykernel turns down
 	pip install ipykernel -U --force-reinstall
