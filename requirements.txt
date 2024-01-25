@@ -1,0 +1,9 @@
+river
+jupyterlab
+numpy
+pandas
+seaborn
+ipykernel
+prettytable
+IPython
+tqdm
