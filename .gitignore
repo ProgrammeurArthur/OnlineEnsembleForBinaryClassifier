@@ -1,1 +1,5 @@
 venv
+__pycache__
+__pycache__/aux.cpython-310.pyc
+__pycache__/ensemble.cpython-310.pyc
+__pycache__/model.cpython-310.pyc
