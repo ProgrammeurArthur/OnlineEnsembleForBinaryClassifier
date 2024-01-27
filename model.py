@@ -385,6 +385,12 @@ def tree_SGTClassifier(dataset):
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
         pass
+    elif isinstance(dataset, datasets.HTTP):
+        model = tree.SGTClassifier(
+        #feature_quantizer=tree.splitter.StaticQuantizer(
+         #   n_bins=32, warm_start=10
+        #)
+        )
     else:
         model|=preprocessing.StandardScaler()
         model |= tree.SGTClassifier(
