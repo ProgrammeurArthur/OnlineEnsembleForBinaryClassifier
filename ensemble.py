@@ -6,7 +6,10 @@ from river import preprocessing as pp
 #rom river.base import MetaEstimatorMixin
 from river.base import Classifier
 from river import stats
+import time as t
+import aux as a
 import numpy as np
+metric_pref="Accuracy"
 # def createList(models, metrics):
 #     estimators=[]
 #     for name, model in models.items():
@@ -22,7 +25,11 @@ def createList(models, metrics):
 
 def ensemble_predict_one( estimators,x, opcao,y):
     for  model in estimators:
+        model.round+=1
+        start_time_predict = t.time()
         y_pred = model.get_model().predict_one(x)
+        end_time_predict = t.time()
+        model.Time2predict=a.calTime(end_time_predict,start_time_predict)
         #print(y_pred)
         model.set_predict_ensemble(y_pred)
         if y_pred is not None:
@@ -48,26 +55,26 @@ def ensemble_predict_one( estimators,x, opcao,y):
             #     return False
             return func_voting(estimators)
         case '3':
-            for model in estimators:
-                print(f"{model.get_name()} - RollingAccuracy: {model.get_metrics()['RollingAccuracy'].get()}")
+            # for model in estimators:
+            #     print(f"{model.get_name()} - RollingAccuracy: {model.get_metrics()['RollingAccuracy'].get()}")
             #RollingAccuracy
-            best_model = max(estimators, key=lambda model: model.get_metrics()["RollingAccuracy"].get())
+            best_model = max(estimators, key=lambda model: model.get_metrics()[metric_pref].get())
             return best_model.get_predict_ensemble(), best_model.get_name()
         case '4':
             predictions=0.0
             # Método best model average
-            predictions += sum(model.get_metrics()["RollingAccuracy"].get() for model in estimators)
-            print(f'predicao total:{predictions}')
+            predictions += sum(model.get_metrics()[metric_pref].get() for model in estimators)
+            #print(f'predicao total:{predictions}')
             average_prediction = predictions / len(estimators)
-            print(f'predicao media:{average_prediction}')
+            #print(f'predicao media:{average_prediction}')
             # Escolher apenas modelos cujas previsões estão acima da média
-            selected_models = [model for model in estimators if model.get_metrics()["RollingAccuracy"].get() > average_prediction]
-            print([model.get_name() for model in selected_models])
+            selected_models = [model for model in estimators if model.get_metrics()[metric_pref].get() > average_prediction]
+            #print([model.get_name() for model in selected_models])
             return func_voting(selected_models)
         case '5':
             threshold = 0.8
-            selected_models = [model for model in estimators if model.get_metrics()["RollingAccuracy"].get() > threshold]
-            print([model.get_name() for model in selected_models])
+            selected_models = [model for model in estimators if model.get_metrics()[metric_pref].get() > threshold]
+            #print([model.get_name() for model in selected_models])
             return func_voting(selected_models)
         case '6':
             pass
@@ -89,18 +96,33 @@ def func_voting(estimators):
     elif false_count > true_count:
         return False
 
+def criar_Csv_models(estimators, name_bd, name_ensemble):
+    for model in estimators:
+        a.criarCSV(model.buffer,model.name, name_bd, name_ensemble)
 
 
 def ensemble_learn_one(estimators,x,y):
     for model in estimators:
+        
+        start_time_learn = t.time()
         model.get_model().learn_one(x, y)
-
+        end_time_learn = t.time()
+        model.Time2learn=a.calTime(end_time_learn, start_time_learn)
+        model.Timestamp+=( model.Time2learn + model.Time2predict)
+        name=model.get_name()
+        metrics_data=a.dados(model.round,model.Timestamp, model.Time2predict, model.Time2learn, model.metrics, name)
+        model.buffer.append(metrics_data)
 
 class Model_class:
     def __init__(self,name, model, metrics):
         self.name=name
         self.model=model
         self.metrics=metrics
+        self.buffer=[]
+        self.round=0
+        self.Timestamp=0.0
+        self.Time2learn=0.0
+        self.Time2predict=0.0
 
     def get_model(self):
         return self.model

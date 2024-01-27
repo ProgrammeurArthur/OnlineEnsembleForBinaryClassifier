@@ -7,7 +7,7 @@ import ensemble as e
 #from river import ensemble
 from river.linear_model import LogisticRegression as lr
 from river.tree import HoeffdingTreeClassifier as htc
-
+from tqdm import tqdm
 
 dataset, name_bd= a.escolha_BD()
 
@@ -142,8 +142,8 @@ while(1):
                 end_time_learn = t.time()
                 Time2learn= a.calTime(start_time_learn, end_time_learn)
 
-                end_time_Timestamp=t.time()
-                Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+                #end_time_Timestamp=t.time()
+                Timestamp+= (Time2learn+Time2predict)
 
                 metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
                 buffer.append(metrics_data)
@@ -161,13 +161,14 @@ while(1):
                 #print(metrics_data)
 
 
-            t_end_time_Timestamp=t.time()
-            Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
-            Round+=1
-            metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
-            buffer.append(metrics_data)
-            print(buffer)
+            #t_end_time_Timestamp=t.time()
+            #Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+            #Round+=1
+            #metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+            #buffer.append(metrics_data)
+            #print(buffer)
             a.criarCSV(buffer,model_name, name_bd)
+            
         # result_dict = {metric_name: metric.get() for metric_name, metric in metrics_dict.items()}
         # print(result_dict)
     elif(opcao=='2'):
@@ -178,13 +179,13 @@ while(1):
         model_name='ensemble_voting'
         #print(estimators)
         Round=0
-        t_start_time_Timestamp=t.time()
-        for x, y in dataset:
+        #t_start_time_Timestamp=t.time()
+        for x, y in tqdm(dataset):
              start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
              estimators_y_pred=e.ensemble_predict_one(estimators,x,opcao,y)
-             print(estimators_y_pred)
+             #print(estimators_y_pred)
              end_time_predict = t.time()
              Time2predict= a.calTime(start_time_predict, end_time_predict)
 
@@ -198,20 +199,21 @@ while(1):
              Time2learn= a.calTime(start_time_learn, end_time_learn)
             
 
-             end_time_Timestamp=t.time()
-             Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+             #end_time_Timestamp=t.time()
+             Timestamp+= (Time2learn+Time2predict)
 
              metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
              buffer.append(metrics_data)
 
         
-        t_end_time_Timestamp=t.time()
-        Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
-        Round+=1
-        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
-        buffer.append(metrics_data)
-        print(buffer)
-        a.criarCSV(buffer,model_name, name_bd)
+        #t_end_time_Timestamp=t.time()
+        #Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+        #Round+=1
+        #metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+        #buffer.append(metrics_data)
+        #print(buffer)
+        a.criarCSV(buffer,model_name, name_bd,model_name)
+        e.criar_Csv_models(estimators, name_bd, model_name)
     elif(opcao=='3'):
         buffer=[]
         #metrics_dict=metrics_dict
@@ -221,8 +223,8 @@ while(1):
         ensemble_model_name='ensemble_best_model'
         #print(estimators)
         Round=0
-        t_start_time_Timestamp=t.time()
-        for x, y in dataset:
+        #t_start_time_Timestamp=t.time()
+        for x, y in tqdm(dataset):
              start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
@@ -241,20 +243,22 @@ while(1):
              Time2learn= a.calTime(start_time_learn, end_time_learn)
             
 
-             end_time_Timestamp=t.time()
-             Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+             #end_time_Timestamp=t.time()
+             Timestamp+= (Time2learn+Time2predict)
 
              metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
              buffer.append(metrics_data)
 
         
-        t_end_time_Timestamp=t.time()
-        Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
-        Round+=1
-        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
-        buffer.append(metrics_data)
+        #t_end_time_Timestamp=t.time()
+        #Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+        #Round+=1
+        #metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+        #buffer.append(metrics_data)
         #print(buffer)
-        a.criarCSV(buffer,ensemble_model_name, name_bd)
+        a.criarCSV(buffer,ensemble_model_name, name_bd, ensemble_model_name)
+        e.criar_Csv_models(estimators, name_bd, ensemble_model_name)
+
     elif(opcao=='4'):
         buffer=[]
         #metrics_dict=metrics_dict
@@ -264,9 +268,9 @@ while(1):
         ensemble_model_name='ensemble_best_model_average'
         #print(estimators)
         Round=0
-        t_start_time_Timestamp=t.time()
-        for x, y in dataset:
-             start_time_Timestamp=t.time()
+        #t_start_time_Timestamp=t.time()
+        for x, y in tqdm(dataset):
+             #start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
              estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y)
@@ -285,19 +289,21 @@ while(1):
             
 
              end_time_Timestamp=t.time()
-             Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+             Timestamp+= (Time2learn+Time2predict)
 
              metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
              buffer.append(metrics_data)
 
         
-        t_end_time_Timestamp=t.time()
-        Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
-        Round+=1
-        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
-        buffer.append(metrics_data)
+        #t_end_time_Timestamp=t.time()
+        #Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+        #Round+=1
+        #metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+        #buffer.append(metrics_data)
         #print(buffer)
-        a.criarCSV(buffer,ensemble_model_name, name_bd)
+        a.criarCSV(buffer,ensemble_model_name, name_bd, ensemble_model_name)
+        e.criar_Csv_models(estimators, name_bd, ensemble_model_name)
+
     elif(opcao=='5'):
         buffer=[]
         #metrics_dict=metrics_dict
@@ -307,9 +313,9 @@ while(1):
         ensemble_model_name='ensemble_best_model_threshold'
         #print(estimators)
         Round=0
-        t_start_time_Timestamp=t.time()
-        for x, y in dataset:
-             start_time_Timestamp=t.time()
+        #t_start_time_Timestamp=t.time()
+        for x, y in tqdm(dataset):
+             #start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
              estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y)
@@ -327,20 +333,22 @@ while(1):
              Time2learn= a.calTime(start_time_learn, end_time_learn)
             
 
-             end_time_Timestamp=t.time()
-             Timestamp= a.calTime(start_time_Timestamp,end_time_Timestamp)
+             #end_time_Timestamp=t.time()
+             Timestamp+= (Time2learn+Time2predict)
 
              metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
              buffer.append(metrics_data)
 
         
-        t_end_time_Timestamp=t.time()
-        Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
-        Round+=1
-        metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
-        buffer.append(metrics_data)
+        #t_end_time_Timestamp=t.time()
+        #Timestamp= a.calTime(t_start_time_Timestamp,t_end_time_Timestamp)
+        #Round+=1
+        #metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
+        #buffer.append(metrics_data)
         #print(buffer)
-        a.criarCSV(buffer,ensemble_model_name, name_bd)
+        a.criarCSV(buffer,ensemble_model_name, name_bd, ensemble_model_name)
+        e.criar_Csv_models(estimators, name_bd, ensemble_model_name)
+
     else:
         print('[ERRO] Opcao invalida!')
             

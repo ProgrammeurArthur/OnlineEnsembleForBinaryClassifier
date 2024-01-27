@@ -1,5 +1,6 @@
 from river import datasets, metrics, utils
 import pandas as pd
+import os
 window_size=100
 def escolha_BD():
     opcao= input("Digite o banco de dados que deseja:\n1-SmsSpam\n2-Bananas\n3-CreditCard\n4-Elec2\n5-MaliciousURL(verificar)\n6-Phishing\n7-SMTP\n8-TREC07(verificar)\n9-Higgs\n10-HTTP\n")
@@ -103,10 +104,22 @@ def dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, algoritmo):
     return metrics_data
 
 
-def criarCSV(buffer, name_model, name_bd):
-    df = pd.DataFrame(buffer)
-    csv_file = f'{name_model}_{name_bd}_resultados.csv'
-    df.to_csv(csv_file, index=False)
+# def criarCSV(buffer, name_model, name_bd):
+#     df = pd.DataFrame(buffer)
+#     csv_file = f'{name_model}_{name_bd}_resultados.csv'
+#     df.to_csv(csv_file, index=False)
     
+def criarCSV(buffer, name_model, name_bd, ensemble_name):
+    # Criar diretório name_bd se não existir
+    dir_path_bd = os.path.join(name_bd)
+    os.makedirs(dir_path_bd, exist_ok=True)
 
+    # Criar diretório name_model dentro de name_bd se não existir
+    dir_path_model = os.path.join(dir_path_bd, ensemble_name)
+    os.makedirs(dir_path_model, exist_ok=True)
+
+    # Criar DataFrame e salvar CSV dentro do diretório name_model
+    df = pd.DataFrame(buffer)
+    csv_file = os.path.join(dir_path_model, f'{name_model}_resultados.csv')
+    df.to_csv(csv_file, index=False)
 
