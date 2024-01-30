@@ -72,9 +72,9 @@ model_AMFC= m.forest_AMFClassifier(dataset)
 model_ALMA=m.linear_model_ALMAClassifier(dataset)
 model_PAC=m.linear_model_PAClassifier(dataset)
 model_SoftmaxRegression=m.linear_model_SoftmaxRegression(dataset)
-#model_ComplementNB=m.naive_bayes_ComplementNB(dataset)
+model_ComplementNB=m.naive_bayes_ComplementNB(dataset)
 model_GaussianNB=m.naive_bayes_GaussianNB(dataset)
-#model_MultinomialNB=m.naive_bayes_MultinomialNB(dataset)
+model_MultinomialNB=m.naive_bayes_MultinomialNB(dataset)
 model_KNNClassifier=m.neighbors_KNNClassifier(dataset)
 
 models={
@@ -106,9 +106,9 @@ models={
     "model_linear_ALMAClassifier":model_ALMA,
     "linear_model_PAClassifier":model_PAC,
     "linear_model_SoftmaxRegression":model_SoftmaxRegression,
-#    "model_ComplementNB":model_ComplementNB,
+    "model_ComplementNB":model_ComplementNB,
     "model_GaussianNB":model_GaussianNB,
-#    "model_MultinomialNB":model_MultinomialNB,
+    "model_MultinomialNB":model_MultinomialNB,
     "model_KNNClassifier":model_KNNClassifier
 
 }
@@ -123,7 +123,7 @@ while(1):
 
         
             t_start_time_Timestamp=t.time()
-            for x, y in dataset:
+            for x, y in tqdm(dataset):
                 start_time_Timestamp=t.time()
                 Round+=1
                 

@@ -29,7 +29,7 @@ def ensemble_predict_one( estimators,x, opcao,y):
         start_time_predict = t.time()
         y_pred = model.get_model().predict_one(x)
         end_time_predict = t.time()
-        model.Time2predict=a.calTime(end_time_predict,start_time_predict)
+        model.Time2predict=a.calTime(start_time_predict,end_time_predict)
         #print(y_pred)
         model.set_predict_ensemble(y_pred)
         if y_pred is not None:
@@ -107,7 +107,7 @@ def ensemble_learn_one(estimators,x,y):
         start_time_learn = t.time()
         model.get_model().learn_one(x, y)
         end_time_learn = t.time()
-        model.Time2learn=a.calTime(end_time_learn, start_time_learn)
+        model.Time2learn=a.calTime(start_time_learn, end_time_learn)
         model.Timestamp+=( model.Time2learn + model.Time2predict)
         name=model.get_name()
         metrics_data=a.dados(model.round,model.Timestamp, model.Time2predict, model.Time2learn, model.metrics, name)
