@@ -58,7 +58,7 @@ model_OCC= m.OutputCodeClassifier(dataset)
 model_EFDTC= m.tree_ExtremelyFastDecisionTreeClassifier(dataset)
 model_HATC= m.tree_HoeffdingAdaptiveTreeClassifier(dataset)
 model_HTC= m.tree_HoeffdingTreeClassifier(dataset)
-model_SGTC= m.tree_SGTClassifier(dataset)
+#model_SGTC= m.tree_SGTClassifier(dataset)
 model_ABC= m.ensemble_ADWINBaggingClassifier(dataset)
 model_ABOC= m.ensemble_ADWINBoostingClassifier(dataset)
 model_BC= m.ensemble_BOLEClassifier(dataset)
@@ -78,7 +78,7 @@ model_MultinomialNB=m.naive_bayes_MultinomialNB(dataset)
 model_KNNClassifier=m.neighbors_KNNClassifier(dataset)
 
 models={
-    "BernoulliNB": model_B,
+     "BernoulliNB": model_B,
     "ARFClassifier": model_ARF,
     "HardSamplingClassifier": model_Hard,
     "RandomOverSampler": model_ROS,
@@ -88,11 +88,11 @@ models={
     "Perceptron": model_P,
     "OneVsOneClassifier": model_OVOC,
     "OneVsRestClassifier": model_OVRC,
-    "OutputCodeClassifier": model_OCC,
+    "OutputCodeClassifier": model_OCC, 
     "tree_ExtremelyFastDecisionTreeClassifier": model_EFDTC,
     "tree_HoeffdingAdaptiveTreeClassifier": model_HATC,
     "tree_HoeffdingTreeClassifier": model_HTC,
-    "tree_SGTClassifier": model_SGTC,
+    #"tree_SGTClassifier": model_SGTC,
     "ensemble_ADWINBaggingClassifier": model_ABC,
     "ensemble_ADWINBoostingClassifier": model_ABOC,
     "ensemble_BOLEClassifier": model_BC,
@@ -106,9 +106,9 @@ models={
     "model_linear_ALMAClassifier":model_ALMA,
     "linear_model_PAClassifier":model_PAC,
     "linear_model_SoftmaxRegression":model_SoftmaxRegression,
-    "model_ComplementNB":model_ComplementNB,
+    #"model_ComplementNB":model_ComplementNB,
     "model_GaussianNB":model_GaussianNB,
-    "model_MultinomialNB":model_MultinomialNB,
+    #"model_MultinomialNB":model_MultinomialNB,
     "model_KNNClassifier":model_KNNClassifier
 
 }
@@ -120,16 +120,21 @@ while(1):
             buffer=[]
             metrics_dict=metrics_dict
             Round, Timestamp, Time2predict, Time2learn=0,0,0,0
-
+            #print(model_name)
         
             t_start_time_Timestamp=t.time()
             for x, y in tqdm(dataset):
+
                 start_time_Timestamp=t.time()
                 Round+=1
                 
                 start_time_predict = t.time()
                 y_pred = model.predict_one(x)
-                #print(f'y_pred:{y_pred}')
+                if isinstance(dataset, datasets.HTTP):
+                    y_pred= a.aux_HTTP(y_pred)
+                print(f'y_pred:{y_pred}')
+                print(model_name)
+
                 end_time_predict = t.time()
                 Time2predict= a.calTime(start_time_predict, end_time_predict)
 
@@ -167,7 +172,7 @@ while(1):
             #metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict, model_name)
             #buffer.append(metrics_data)
             #print(buffer)
-            a.criarCSV(buffer,model_name, name_bd)
+            a.criarCSV(buffer,model_name, name_bd, model_name)
             
         # result_dict = {metric_name: metric.get() for metric_name, metric in metrics_dict.items()}
         # print(result_dict)
@@ -184,7 +189,7 @@ while(1):
              start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
-             estimators_y_pred=e.ensemble_predict_one(estimators,x,opcao,y)
+             estimators_y_pred=e.ensemble_predict_one(estimators,x,opcao,y, dataset)
              #print(estimators_y_pred)
              end_time_predict = t.time()
              Time2predict= a.calTime(start_time_predict, end_time_predict)
@@ -228,7 +233,7 @@ while(1):
              start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
-             estimators_y_pred, model_name =e.ensemble_predict_one(estimators,x,opcao,y)
+             estimators_y_pred, model_name =e.ensemble_predict_one(estimators,x,opcao,y, dataset)
              #print(estimators_y_pred)
              end_time_predict = t.time()
              Time2predict= a.calTime(start_time_predict, end_time_predict)
@@ -273,7 +278,7 @@ while(1):
              #start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
-             estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y)
+             estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y, dataset)
              #print(estimators_y_pred)
              end_time_predict = t.time()
              Time2predict= a.calTime(start_time_predict, end_time_predict)
@@ -318,7 +323,7 @@ while(1):
              #start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
-             estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y)
+             estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y, dataset)
              #print(estimators_y_pred)
              end_time_predict = t.time()
              Time2predict= a.calTime(start_time_predict, end_time_predict)

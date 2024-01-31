@@ -31,6 +31,8 @@ def model_database(dataset):
     elif isinstance(dataset, datasets.SMTP):
         model =  compose.Select('dst_bytes','duration','src_bytes')
     elif isinstance(dataset, datasets.TREC07):
+        #model =  compose.Select('body', 'date', 'recipients','sender','subject')
+
         return None #verificar
     return model
 
@@ -46,14 +48,15 @@ def BernoulliNB(dataset):
     elif isinstance(dataset, datasets.TREC07):
         #model =  model_database(dataset)
         model = (
-          #feature_extraction.TFIDF(on='body') |
-          #preprocessing.StandardScaler() |            
-          naive_bayes.BernoulliNB(alpha=0)
+        #feature_extraction.TFIDF(on='body') |
+        preprocessing.StandardScaler() |            
+         naive_bayes.BernoulliNB(alpha=0)
         )
-    elif isinstance(dataset, datasets.MaliciousURL):
+    elif isinstance(dataset,  datasets.MaliciousURL):
         #model =  model_database(dataset)
         model = (
-        preprocessing.StandardScaler() |
+        #feature_extraction.TFIDF() |
+        #preprocessing.StandardScaler() |
         naive_bayes.BernoulliNB(alpha=0)
         )
     else:
@@ -64,9 +67,9 @@ def BernoulliNB(dataset):
         )
     return model
 
-def ARFClassifier(databases):
-    model =  model_database(databases)
-    if isinstance(databases, datasets.MaliciousURL):
+def ARFClassifier(dataset):
+    model =  model_database(dataset)
+    if isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model= forest.ARFClassifier(seed=seed_aux, leaf_prediction="mc")
     else:
         model|= forest.ARFClassifier(seed=seed_aux, leaf_prediction="mc")
@@ -85,13 +88,13 @@ def HardSamplingClassifier(dataset):
             seed=seed_aux,
         )
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model=(preprocessing.StandardScaler() |
         imblearn.HardSamplingClassifier(
             naive_bayes.BernoulliNB(alpha=0),
@@ -124,13 +127,13 @@ def RandomOverSampler(dataset):
         desired_dist={False: 0.4, True: 0.6},
         seed=seed_aux
     )
-    elif isinstance(dataset, datasets.TREC07):
+#    elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+#        pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         #model =  model_database(dataset)
         model = (imblearn.RandomOverSampler(
         (
@@ -164,13 +167,13 @@ def RandomSampler(dataset):
         sampling_rate=0.8,
         seed=seed_aux
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         #model =  model_database(dataset)
         model = (imblearn.RandomSampler(
         (
@@ -205,13 +208,13 @@ def RandomUnderSampler(dataset):
             desired_dist={False: 0.4, True: 0.6},
             seed=seed_aux
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         #model =  model_database(dataset)
         model = ( imblearn.RandomUnderSampler(
             (
@@ -263,13 +266,13 @@ def Perceptron(dataset):
     if isinstance(dataset, datasets.SMSSpam):
         model |= (feature_extraction.TFIDF(on='body')  | linear_model.Perceptron())
 
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         #model =  model_database(dataset)
         model = (   ( preprocessing.StandardScaler() | linear_model.Perceptron())
         )
@@ -283,13 +286,13 @@ def OneVsOneClassifier(dataset):
     if isinstance(dataset, datasets.SMSSpam):
         model|= (feature_extraction.TFIDF(on='body')  |multiclass.OneVsOneClassifier(linear_model.LogisticRegression()))
 
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         #model =  model_database(dataset)
         model = ( preprocessing.StandardScaler()  |multiclass.OneVsOneClassifier(linear_model.LogisticRegression())
         )
@@ -303,13 +306,13 @@ def OneVsRestClassifier(dataset):
     if isinstance(dataset, datasets.SMSSpam):
         model|= (feature_extraction.TFIDF(on='body')  |multiclass.OneVsRestClassifier(linear_model.LogisticRegression()))
 
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         #model =  model_database(dataset)
         model =( preprocessing.StandardScaler()   |multiclass.OneVsRestClassifier(linear_model.LogisticRegression()))
         
@@ -328,13 +331,13 @@ def OutputCodeClassifier(dataset):
         seed=seed_aux
         ))
 
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         #model =  model_database(dataset)
         model =( preprocessing.StandardScaler()   | multiclass.OutputCodeClassifier(
         classifier=linear_model.LogisticRegression(),
@@ -407,13 +410,13 @@ def tree_HoeffdingAdaptiveTreeClassifier(dataset):
         seed=seed_aux
         )
 
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model=preprocessing.StandardScaler()
         model |= tree.HoeffdingAdaptiveTreeClassifier(
         grace_period=100,
@@ -447,14 +450,14 @@ def tree_HoeffdingTreeClassifier(dataset):
         nb_threshold=10
     )
 
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
+    #    pass
 
-    elif isinstance(dataset, datasets.MaliciousURL):
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model=preprocessing.StandardScaler()
         model |= tree.HoeffdingTreeClassifier(
         grace_period=100,
@@ -476,44 +479,47 @@ def tree_HoeffdingTreeClassifier(dataset):
 
     return model
 
-def tree_SGTClassifier(dataset):
-    model=model_database(dataset)
-    if isinstance(dataset, datasets.SMSSpam):
-        model |= tree.SGTClassifier(
-        feature_quantizer=tree.splitter.StaticQuantizer(
-            n_bins=32, warm_start=10
-        )
-        )
+# def tree_SGTClassifier(dataset):
+#     model=model_database(dataset)
+#     if isinstance(dataset, datasets.SMSSpam):
+#         model |= tree.SGTClassifier(
+#         feature_quantizer=tree.splitter.StaticQuantizer(
+#             n_bins=32, warm_start=10
+#         )
+#         )
 
-    elif isinstance(dataset, datasets.TREC07):
-        #model |= (
-        #  feature_extraction.TFIDF(on='body') |
-        #  naive_bayes.BernoulliNB(alpha=0)
-        #)
-        pass
-    elif isinstance(dataset, datasets.HTTP):
-        model = tree.SGTClassifier(
-        #feature_quantizer=tree.splitter.StaticQuantizer(
-         #   n_bins=32, warm_start=10
-        #)
-        )
-    elif isinstance(dataset, datasets.MaliciousURL):
-        model=preprocessing.StandardScaler()
-        model |= tree.SGTClassifier(
-        feature_quantizer=tree.splitter.StaticQuantizer(
-            n_bins=32, warm_start=10
-        )
-        )
+#     #elif isinstance(dataset, datasets.TREC07):
+#         #model |= (
+#         #  feature_extraction.TFIDF(on='body') |
+#         #  naive_bayes.BernoulliNB(alpha=0)
+#         #)
+#     #    pass
+#     elif isinstance(dataset, datasets.HTTP):
+#         model = tree.SGTClassifier(
+#         feature_quantizer=tree.splitter.StaticQuantizer(
+#             n_bins=32, warm_start=10
+#         )
+#         )
+#     elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
+#         model=preprocessing.StandardScaler()
+#         model |= tree.SGTClassifier(
+#         feature_quantizer=tree.splitter.StaticQuantizer(
+#             n_bins=32, warm_start=10
+#         )
+#         )
 
-    else:
-        model|=preprocessing.StandardScaler()
-        model |= tree.SGTClassifier(
-        feature_quantizer=tree.splitter.StaticQuantizer(
-            n_bins=32, warm_start=10
-        )
-        )
+#     else:
+#         model|=preprocessing.StandardScaler()
+#         model |= tree.SGTClassifier(
+#         #feature_quantizer= tree.splitter.Quantizer (
+#         feature_quantizer=tree.splitter.DynamicQuantizer(
+#             #n_bins=32, warm_start=1000000#Elec2
+#             #n_bins=32, warm_start=1000000#MaliciousURL
 
-    return model
+#         ), grace_period=100, max_depth=10
+#         )
+
+#     return model
 
 def ensemble_ADWINBaggingClassifier(dataset):
     model=model_database(dataset)
@@ -529,13 +535,13 @@ def ensemble_ADWINBaggingClassifier(dataset):
         seed=seed_aux
         )
 
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = ensemble.ADWINBaggingClassifier(
         model=(
         #feature_extraction.TFIDF(on='body')  |
@@ -570,7 +576,7 @@ def ensemble_ADWINBoostingClassifier(dataset):
         n_models=3,
         seed=seed_aux
     )
-    elif isinstance(dataset, datasets.MaliciousURL):
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = ensemble.ADWINBoostingClassifier(
         model=(
             #feature_extraction.TFIDF(on='body')  |
@@ -580,14 +586,14 @@ def ensemble_ADWINBoostingClassifier(dataset):
         n_models=3,
         seed=seed_aux
     )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
+    #    pass
     else:
-        #model|=preprocessing.StandardScaler()
+        model|=preprocessing.StandardScaler()
         model |= ensemble.ADWINBoostingClassifier(
         model=(
             #feature_extraction.TFIDF(on='body')  |
@@ -613,13 +619,13 @@ def ensemble_AdaBoostClassifier(dataset):
         n_models=5,
         seed=seed_aux
     )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = preprocessing.StandardScaler()
         model |= ensemble.AdaBoostClassifier(
         model=(
@@ -658,13 +664,13 @@ def ensemble_BOLEClassifier(dataset):
         n_models=10,
         seed=seed_aux
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = preprocessing.StandardScaler()
         model |= ensemble.BOLEClassifier(
         model=drift.DriftRetrainingClassifier(
@@ -698,13 +704,13 @@ def ensemble_BaggingClassifier(dataset):
         n_models=3,
         seed=seed_aux
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = preprocessing.StandardScaler()
         model |= ensemble.BaggingClassifier(
         model=(
@@ -740,13 +746,13 @@ def ensemble_LeveragingBaggingClassifier(dataset):
             n_models=3,
             seed=seed_aux
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = preprocessing.StandardScaler()
         model |= ensemble.LeveragingBaggingClassifier(
             model=(
@@ -755,7 +761,7 @@ def ensemble_LeveragingBaggingClassifier(dataset):
                 linear_model.LogisticRegression()
             ),
             n_models=3,
-            seed=42
+            seed=seed_aux
         )
     else:
         model |= preprocessing.StandardScaler()
@@ -783,13 +789,13 @@ def ensemble_SRPClassifier(dataset):
         model = ensemble.SRPClassifier(
             model=base_model, n_models=3, seed=seed_aux,
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         base_model = tree.HoeffdingTreeClassifier(
         grace_period=100,
         split_criterion='info_gain',
@@ -825,13 +831,13 @@ def ensemble_StackingClassifier(dataset):
             meta_classifier=linear_model.LogisticRegression()
         ))
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = compose.Pipeline(
         #(#'feature',feature_extraction.TFIDF(on='body')),
         ('scale', preprocessing.StandardScaler()),
@@ -863,13 +869,13 @@ def ensemble_VotingClassifier(dataset):
                 naive_bayes.GaussianNB()
             ])
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = (
             #feature_extraction.TFIDF(on='body')|
             preprocessing.StandardScaler() |
@@ -902,13 +908,13 @@ def forest_AMFClassifier(dataset):
             dirichlet=0.5,
             seed=seed_aux
         ))
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model=(#feature_extraction.TFIDF(on='body')|
             preprocessing.StandardScaler() |
             forest.AMFClassifier(
@@ -936,13 +942,13 @@ def linear_model_ALMAClassifier(dataset):
         preprocessing.StandardScaler() |
         linear_model.ALMAClassifier()
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+     #   pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = (
         #feature_extraction.TFIDF(on='body')|
         preprocessing.StandardScaler() |
@@ -966,13 +972,13 @@ def linear_model_PAClassifier(dataset):
             C=0.01,
             mode=1
         ))
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = (
             #feature_extraction.TFIDF(on='body')|
             preprocessing.StandardScaler() |
@@ -996,13 +1002,13 @@ def linear_model_SoftmaxRegression(dataset):
         model |= feature_extraction.TFIDF(on='body')
         model |= preprocessing.StandardScaler()
         model |= linear_model.SoftmaxRegression()
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = preprocessing.StandardScaler()
         model |= linear_model.SoftmaxRegression()
     else:
@@ -1017,19 +1023,19 @@ def naive_bayes_ComplementNB(dataset):
             (feature_extraction.TFIDF(on='body')),
             ( naive_bayes.ComplementNB(alpha=1))
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+     #   pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = compose.Pipeline(
             #("tfidf", feature_extraction.TFIDF(on='body')),
             ( naive_bayes.ComplementNB())
         )
     else:
-        model = compose.Pipeline(
+        model |= compose.Pipeline(
             #("tfidf", feature_extraction.TFIDF(on='body')),
             ( naive_bayes.ComplementNB())
         )
@@ -1040,14 +1046,14 @@ def naive_bayes_GaussianNB(dataset):
     if isinstance(dataset, datasets.SMSSpam):               
         model |= feature_extraction.TFIDF(on='body')
         model |= naive_bayes.GaussianNB()
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
-         model = naive_bayes.GaussianNB()
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
+        model = naive_bayes.GaussianNB()
 
     else:
         model |= naive_bayes.GaussianNB()
@@ -1061,13 +1067,13 @@ def naive_bayes_MultinomialNB(dataset):
             #("tokenize", feature_extraction.BagOfWords(lowercase=False)),
             ("nb", naive_bayes.MultinomialNB(alpha=1))
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model = compose.Pipeline(
             #("tfidf", feature_extraction.TFIDF(on='body')),
             #("tokenize", feature_extraction.BagOfWords(lowercase=False)),
@@ -1094,13 +1100,13 @@ def neighbors_KNNClassifier(dataset):
                 )
             )
         )
-    elif isinstance(dataset, datasets.TREC07):
+    #elif isinstance(dataset, datasets.TREC07):
         #model |= (
         #  feature_extraction.TFIDF(on='body') |
         #  naive_bayes.BernoulliNB(alpha=0)
         #)
-        pass
-    elif isinstance(dataset, datasets.MaliciousURL):
+    #    pass
+    elif isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         l1_dist = functools.partial(utils.math.minkowski_distance, p=1)
         model = (#feature_extraction.TFIDF(on='body')|
             preprocessing.StandardScaler() |
@@ -1157,10 +1163,10 @@ def list_models(dataset):
         leaf_prediction='mc',
         nb_threshold=10)
 
-    model12= tree.SGTClassifier(
-        feature_quantizer=tree.splitter.StaticQuantizer(
-            n_bins=32, warm_start=10
-        ))    
+    # model12= tree.SGTClassifier(
+    #     feature_quantizer=tree.splitter.StaticQuantizer(
+    #         n_bins=32, warm_start=10
+    #     ))    
     
     model14 = ensemble.AdaBoostClassifier(
         model=(
@@ -1289,16 +1295,16 @@ def list_models(dataset):
             n_models=3,
             seed=seed_aux
         )
-        list_model=[model1,model3,model4, model5, model6, model7, model8, model9, model10, model11, model12, model13, model14, model15, model16
+        list_model=[model1,model3,model4, model5, model6, model7, model8, model9, model10, model11, model13, model14, model15, model16
                 ,model17, model18, model19,model21,model22 ,model23, model24,model25, model26]
         return list_model
         
-    elif isinstance(dataset, datasets.TREC07):
-        #model |= (
-        #  feature_extraction.TFIDF(on='body') |
-        #  naive_bayes.BernoulliNB(alpha=0)
-        #)
-        pass
+    # elif isinstance(dataset, datasets.TREC07):
+    #     #model |= (
+    #     #  feature_extraction.TFIDF(on='body') |
+    #     #  naive_bayes.BernoulliNB(alpha=0)
+    #     #)
+    #     pass
     else:
         model2=forest.ARFClassifier(seed=8, leaf_prediction="mc")
         model4 = imblearn.RandomOverSampler(
@@ -1355,7 +1361,7 @@ def list_models(dataset):
             seed=seed_aux
         )
         
-        list_model=[model1,model2,model3,model4, model5, model6, model7, model8, model9, model10, model11, model12, model13, model14, model15, model16
+        list_model=[model1,model2,model3,model4, model5, model6, model7, model8, model9, model10, model11,  model13, model14, model15, model16
                 ,model17, model18, model19,model21,model22 ,model23, model24,model25, model26]
         return list_model
 
