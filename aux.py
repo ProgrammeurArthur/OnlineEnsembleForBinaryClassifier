@@ -17,39 +17,39 @@ def escolha_BD():
     #dataset_SMTP=datasets.SMTP()
     #dataset_TREC07=datasets.TREC07()
     #dataset_Higgs=datasets.Higgs()
-    match opcao:
-        case '1':
-            dataset=datasets.SMSSpam()
-            name='SMSSpam'
-        case '2':
-            dataset=datasets.Bananas()
-            name='Bananas'
-        case '3':
-            dataset=datasets.CreditCard()
-            name='CreditCard'
-        case '4':
-            dataset=datasets.Elec2()
-            name='Elec2'
-        case '5':
-            dataset=datasets.MaliciousURL()
-            name='MaliciousURL'
-        case '6':
-            dataset=datasets.Phishing()
-            name='Phishing'
-        case '7':
-            dataset=datasets.SMTP()
-            name='SMTP'
-        case '8':
-            dataset=datasets.Higgs()
-            name='Higgs'    
-        case '9':
-            dataset=datasets.TREC07()
-            name='TREC07'
-        case '10':
-            dataset=datasets.HTTP()
-            name='HTTP'
-        case _:
-            print("[ERRO]Opção inválida.")
+    if(opcao=='1'):
+        dataset=datasets.SMSSpam()
+        name='SMSSpam'
+    elif(opcao=='2'):
+        dataset=datasets.Bananas()
+        name='Bananas'
+    elif(opcao=='3'):
+        dataset=datasets.CreditCard()
+        name='CreditCard'
+    elif(opcao== '4'):
+        dataset=datasets.Elec2()
+        name='Elec2'
+    elif(opcao== '5'):
+        dataset=datasets.MaliciousURL()
+        name='MaliciousURL'
+    elif(opcao=='6'):
+        dataset=datasets.Phishing()
+        name='Phishing'
+    elif(opcao== '7'):
+        dataset=datasets.SMTP()
+        name='SMTP'
+    elif(opcao== '8'):
+        dataset=datasets.Higgs()
+        name='Higgs'    
+    elif(opcao== '9'):
+        dataset=datasets.TREC07()
+        name='TREC07'
+    elif(opcao== '10'):
+        dataset=datasets.HTTP()
+        name='HTTP'
+    else:
+        print("[ERRO]Opção inválida.")
+        
     return dataset, name
 
 
