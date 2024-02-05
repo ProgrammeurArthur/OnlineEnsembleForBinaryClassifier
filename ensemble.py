@@ -39,8 +39,10 @@ def ensemble_predict_one( estimators,x, opcao,y, dataset):
             for metric in model.get_metrics().values():
                 metric.update(y_true=y, y_pred=y_pred)
 
-    match opcao:
-        case '2':
+    #match opcao:
+    #    case '2':
+    if(opcao=='2'):
+
             # true_count =0
             # false_count=0
             # none_count=0
@@ -56,31 +58,37 @@ def ensemble_predict_one( estimators,x, opcao,y, dataset):
             #   return True
             # elif false_count > true_count:
             #     return False
-            return func_voting(estimators)
-        case '3':
+        return func_voting(estimators)
+        #case '3':
+    elif(opcao=='3'):
             # for model in estimators:
             #     print(f"{model.get_name()} - RollingAccuracy: {model.get_metrics()['RollingAccuracy'].get()}")
             #RollingAccuracy
-            best_model = max(estimators, key=lambda model: model.get_metrics()[metric_pref].get())
-            return best_model.get_predict_ensemble(), best_model.get_name()
-        case '4':
-            predictions=0.0
-            # Método best model average
-            predictions += sum(model.get_metrics()[metric_pref].get() for model in estimators)
-            #print(f'predicao total:{predictions}')
-            average_prediction = predictions / len(estimators)
-            #print(f'predicao media:{average_prediction}')
-            # Escolher apenas modelos cujas previsões estão acima da média
-            selected_models = [model for model in estimators if model.get_metrics()[metric_pref].get() > average_prediction]
-            #print([model.get_name() for model in selected_models])
-            return func_voting(selected_models)
-        case '5':
-            threshold = 0.8
-            selected_models = [model for model in estimators if model.get_metrics()[metric_pref].get() > threshold]
-            #print([model.get_name() for model in selected_models])
-            return func_voting(selected_models)
-        case '6':
-            pass
+        best_model = max(estimators, key=lambda model: model.get_metrics()[metric_pref].get())
+        return best_model.get_predict_ensemble(), best_model.get_name()
+        #case '4':
+    elif(opcao=='4'):
+
+        predictions=0.0
+        # Método best model average
+        predictions += sum(model.get_metrics()[metric_pref].get() for model in estimators)
+        #print(f'predicao total:{predictions}')
+        average_prediction = predictions / len(estimators)
+        #print(f'predicao media:{average_prediction}')
+        # Escolher apenas modelos cujas previsões estão acima da média
+        selected_models = [model for model in estimators if model.get_metrics()[metric_pref].get() > average_prediction]
+        #print([model.get_name() for model in selected_models])
+        return func_voting(selected_models)
+        #case '5':
+    elif(opcao=='5'):
+
+        threshold = 0.8
+        selected_models = [model for model in estimators if model.get_metrics()[metric_pref].get() > threshold]
+        #print([model.get_name() for model in selected_models])
+        return func_voting(selected_models)
+        #case '6':
+    else:
+        pass
 
 def func_voting(estimators):
     true_count =0
