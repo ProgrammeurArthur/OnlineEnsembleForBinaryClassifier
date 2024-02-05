@@ -7,3 +7,4 @@ ipykernel
 prettytable
 IPython
 tqdm
+pytest
