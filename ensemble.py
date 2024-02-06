@@ -31,6 +31,9 @@ def ensemble_predict_one( estimators,x, opcao,y, dataset):
         y_pred = model.get_model().predict_one(x)
         if isinstance(dataset, datasets.HTTP):
             y_pred= a.aux_HTTP(y_pred)
+        elif isinstance(dataset, datasets.TREC07):
+            y_pred=a.aux_TRE07(y_pred)
+
         end_time_predict = t.time()
         model.Time2predict=a.calTime(start_time_predict,end_time_predict)
         #print(y_pred)

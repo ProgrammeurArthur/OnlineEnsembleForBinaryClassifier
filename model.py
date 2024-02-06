@@ -375,7 +375,7 @@ def tree_ExtremelyFastDecisionTreeClassifier(dataset):
         #)
         pass
     elif isinstance(dataset, datasets.MaliciousURL):
-        model=preprocessing.StandardScaler()
+        #model=preprocessing.StandardScaler()
         model |= tree.ExtremelyFastDecisionTreeClassifier(
         grace_period=100,
         split_criterion='info_gain',

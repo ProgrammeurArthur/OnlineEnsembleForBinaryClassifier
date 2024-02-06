@@ -132,3 +132,11 @@ def aux_HTTP(y_pred):
         return True
     else:
         return y_pred
+    
+def aux_TRE07(y_pred):
+    if(y_pred=='spam'):
+        return False
+    elif(y_pred=='not'):
+        return True
+    else:
+        return y_pred
