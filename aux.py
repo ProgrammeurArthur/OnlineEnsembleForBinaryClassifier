@@ -1,6 +1,8 @@
 from river import datasets, metrics, utils
 import pandas as pd
 import os
+from river import stream
+
 window_size=100
 def escolha_BD():
     opcao= input("Digite o Dataset que deseja:\n1-SmsSpam\n2-Bananas\n3-CreditCard\n4-Elec2\n5-MaliciousURL\n6-Phishing\n7-SMTP\n8-Higgs\n9-TRE07\n10-HTTP\n")
@@ -47,6 +49,10 @@ def escolha_BD():
     elif(opcao== '10'):
         dataset=datasets.HTTP()
         name='HTTP'
+    elif(opcao== '11'):
+        local_dataset = '/home/arthur/river_data/dataset_Conceptdrift/dataset_Conceptdrift.csv'
+        dataset= stream.iter_csv(local_dataset)
+        name='dataset_Conceptdrift'
     else:
         print("[ERRO]Opção inválida.")
         

@@ -6,6 +6,7 @@ from river import stats, compat, compose,ensemble
 from river import linear_model,drift, feature_selection,neighbors
 import functools
 from river import stream
+from river.datasets import synth
 
 from pprint import pprint
 
@@ -32,8 +33,10 @@ def model_database(dataset):
         model =  compose.Select('dst_bytes','duration','src_bytes')
     elif isinstance(dataset, datasets.TREC07):
         #model =  compose.Select('body', 'date', 'recipients','sender','subject')
-
         return None #verificar
+    elif isinstance(dataset, synth.ConceptDriftStream):
+        model =  compose.Select('0','1','2','target')
+        
     return model
 
 
