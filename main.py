@@ -8,6 +8,9 @@ import ensemble as e
 from river.linear_model import LogisticRegression as lr
 from river.tree import HoeffdingTreeClassifier as htc
 from tqdm import tqdm
+from more_itertools import take
+from river import stream
+import pandas as pd
 
 dataset, name_bd= a.escolha_BD()
 
@@ -16,11 +19,9 @@ metrics_dict = {
     "ROCAUC": metrics.ROCAUC(),
     "BalancedAccuracy": metrics.BalancedAccuracy(),
     "CohenKappa": metrics.CohenKappa(),
-    #"Completeness": metrics.Completeness(),
     'Recall':metrics.Recall(),
     "F1": metrics.F1(),
     "FBeta": metrics.FBeta(beta=2),
-    "FowlkesMallows": metrics.FowlkesMallows(),
     "GeometricMean": metrics.GeometricMean(),
     "LogLoss": metrics.LogLoss(),
     "MCC": metrics.MCC(),
@@ -32,11 +33,9 @@ metrics_dict = {
     "RollingROCAUC": metrics.RollingROCAUC(window_size),
     "RollingBalancedAccuracy" : utils.Rolling(metrics.BalancedAccuracy(), window_size),
     "RollingCohenKappa" : utils.Rolling(metrics.CohenKappa(), window_size),
-    #"RollingCompleteness" : utils.Rolling(metrics.Completeness(), window_size),
     'RollingRecall':utils.Rolling(metrics.Recall(), window_size),
     "RollingF1" : utils.Rolling(metrics.F1(), window_size),
     "RollingFBeta" : utils.Rolling(metrics.FBeta(beta=2), window_size),
-    "RollingFowlkesMallows" : utils.Rolling(metrics.FowlkesMallows(), window_size),
     "RollingGeometricMean" : utils.Rolling(metrics.GeometricMean(), window_size),
     "RollingLogLoss" : utils.Rolling(metrics.LogLoss(), window_size),
     "RollingMCC" : utils.Rolling(metrics.MCC(), window_size),
@@ -46,38 +45,38 @@ metrics_dict = {
 
 }
 
-model_B= m.BernoulliNB(dataset)
-model_ARF= m.ARFClassifier(dataset)
-model_Hard= m.HardSamplingClassifier(dataset)
-model_ROS= m.RandomOverSampler(dataset)
-model_RS= m.RandomSampler(dataset)
-model_RUS= m.RandomUnderSampler(dataset)
-model_LR= m.LogisticRegression(dataset)
-model_P= m.Perceptron(dataset)
-model_OVOC= m.OneVsOneClassifier(dataset)
-model_OVRC= m.OneVsRestClassifier(dataset)
-model_OCC= m.OutputCodeClassifier(dataset)
-model_EFDTC= m.tree_ExtremelyFastDecisionTreeClassifier(dataset)
-model_HATC= m.tree_HoeffdingAdaptiveTreeClassifier(dataset)
-model_HTC= m.tree_HoeffdingTreeClassifier(dataset)
+model_B= m.BernoulliNB(dataset, name_bd)
+model_ARF= m.ARFClassifier(dataset, name_bd)
+model_Hard= m.HardSamplingClassifier(dataset, name_bd)
+model_ROS= m.RandomOverSampler(dataset, name_bd)
+model_RS= m.RandomSampler(dataset, name_bd)
+model_RUS= m.RandomUnderSampler(dataset, name_bd)
+model_LR= m.LogisticRegression(dataset, name_bd)
+model_P= m.Perceptron(dataset, name_bd)
+model_OVOC= m.OneVsOneClassifier(dataset, name_bd)
+model_OVRC= m.OneVsRestClassifier(dataset,name_bd)
+model_OCC= m.OutputCodeClassifier(dataset, name_bd)
+model_EFDTC= m.tree_ExtremelyFastDecisionTreeClassifier(dataset, name_bd)
+model_HATC= m.tree_HoeffdingAdaptiveTreeClassifier(dataset, name_bd)
+model_HTC= m.tree_HoeffdingTreeClassifier(dataset, name_bd)
 #model_SGTC= m.tree_SGTClassifier(dataset)
-model_ABC= m.ensemble_ADWINBaggingClassifier(dataset)
-model_ABOC= m.ensemble_ADWINBoostingClassifier(dataset)
-model_BC= m.ensemble_BOLEClassifier(dataset)
-model_ADABC= m.ensemble_AdaBoostClassifier(dataset)
-model_BAC= m.ensemble_BaggingClassifier(dataset)
-model_LBC= m.ensemble_LeveragingBaggingClassifier(dataset)
-model_SRPC= m.ensemble_SRPClassifier(dataset)
-model_SC= m.ensemble_StackingClassifier(dataset)
-model_VC= m.ensemble_VotingClassifier(dataset)
-model_AMFC= m.forest_AMFClassifier(dataset)
-model_ALMA=m.linear_model_ALMAClassifier(dataset)
-model_PAC=m.linear_model_PAClassifier(dataset)
-model_SoftmaxRegression=m.linear_model_SoftmaxRegression(dataset)
-model_ComplementNB=m.naive_bayes_ComplementNB(dataset)
-model_GaussianNB=m.naive_bayes_GaussianNB(dataset)
-model_MultinomialNB=m.naive_bayes_MultinomialNB(dataset)
-model_KNNClassifier=m.neighbors_KNNClassifier(dataset)
+model_ABC= m.ensemble_ADWINBaggingClassifier(dataset, name_bd)
+model_ABOC= m.ensemble_ADWINBoostingClassifier(dataset, name_bd)
+model_BC= m.ensemble_BOLEClassifier(dataset, name_bd)
+model_ADABC= m.ensemble_AdaBoostClassifier(dataset, name_bd)
+model_BAC= m.ensemble_BaggingClassifier(dataset, name_bd)
+model_LBC= m.ensemble_LeveragingBaggingClassifier(dataset, name_bd)
+model_SRPC= m.ensemble_SRPClassifier(dataset, name_bd)
+model_SC= m.ensemble_StackingClassifier(dataset, name_bd)
+model_VC= m.ensemble_VotingClassifier(dataset, name_bd)
+model_AMFC= m.forest_AMFClassifier(dataset, name_bd)
+model_ALMA=m.linear_model_ALMAClassifier(dataset, name_bd)
+model_PAC=m.linear_model_PAClassifier(dataset, name_bd)
+model_SoftmaxRegression=m.linear_model_SoftmaxRegression(dataset, name_bd)
+model_ComplementNB=m.naive_bayes_ComplementNB(dataset, name_bd)
+model_GaussianNB=m.naive_bayes_GaussianNB(dataset, name_bd)
+model_MultinomialNB=m.naive_bayes_MultinomialNB(dataset, name_bd)
+model_KNNClassifier=m.neighbors_KNNClassifier(dataset, name_bd)
 
 models={
      "BernoulliNB": model_B,
@@ -115,7 +114,7 @@ models={
 
 }
 while(1):
-    opcao= input("Digite a opcao que deseja criar:\n1-Classificadores indepedentes\n2-Ensemble Voting\n3-Ensemble BM\n4-Ensemble BWM\n5-threshold\n")
+    opcao= input("Digite a opcao que deseja criar:\n1-Classificadores indepedentes\n2-Ensemble Voting\n3-Ensemble BM\n4-Ensemble BWM\n5-threshold\n6-ConceptDrift\n")
     if(opcao=='1'):
         #for model in models.values():
         for model_name, model in models.items():
@@ -187,7 +186,7 @@ while(1):
         #print(estimators)
         Round=0
         #t_start_time_Timestamp=t.time()
-        for x, y in tqdm(dataset):
+        for x, y in take(100000, dataset):
              start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
@@ -231,7 +230,7 @@ while(1):
         #print(estimators)
         Round=0
         #t_start_time_Timestamp=t.time()
-        for x, y in tqdm(dataset):
+        for x, y in take(100000, dataset):
              start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
@@ -276,7 +275,7 @@ while(1):
         #print(estimators)
         Round=0
         #t_start_time_Timestamp=t.time()
-        for x, y in tqdm(dataset):
+        for x, y in take(100000, dataset):
              #start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
@@ -321,7 +320,7 @@ while(1):
         #print(estimators)
         Round=0
         #t_start_time_Timestamp=t.time()
-        for x, y in tqdm(dataset):
+        for x, y in take(100000, dataset):
              #start_time_Timestamp=t.time()
              Round+=1 
              start_time_predict = t.time()
@@ -355,7 +354,50 @@ while(1):
         #print(buffer)
         a.criarCSV(buffer,ensemble_model_name, name_bd, ensemble_model_name)
         e.criar_Csv_models(estimators, name_bd, ensemble_model_name)
+    elif(opcao=='6'):
+        buffer=[]
+        #metrics_dict=metrics_dict
+        Round, Timestamp, Time2predict, Time2learn=0,0,0,0
+        estimators=e.createList(models, metrics_dict)
+        model_name='ensemble_best_model_threshold'
+        ensemble_model_name='ensemble_best_model_threshold'
+        #print(estimators)
+        Round=0
+        #t_start_time_Timestamp=t.time()
+        #for x, y in take(100000, dataset):
+        opcao='5'
+        X=dataset
+        Y='target'
+        y = X.pop(str(Y))
+        for x, y in  tqdm(stream.iter_pandas(X,y)):
+             #start_time_Timestamp=t.time()
+             Round+=1 
+             start_time_predict = t.time()
+             estimators_y_pred =e.ensemble_predict_one(estimators,x,opcao,y, dataset)
+             #print(estimators_y_pred)
+             end_time_predict = t.time()
+             Time2predict= a.calTime(start_time_predict, end_time_predict)
 
+             if estimators_y_pred is not None:
+                for metric in metrics_dict.values():
+                    metric.update(y_true=y, y_pred=estimators_y_pred)
+
+             start_time_learn = t.time()
+             e.ensemble_learn_one(estimators, x, y)
+             end_time_learn = t.time()
+             Time2learn= a.calTime(start_time_learn, end_time_learn)
+            
+
+             #end_time_Timestamp=t.time()
+             Timestamp+= (Time2learn+Time2predict)
+
+             metrics_data= a.dados(Round, Timestamp, Time2predict, Time2learn, metrics_dict,model_name)
+             buffer.append(metrics_data)
+
+        
+      
+        a.criarCSV(buffer,ensemble_model_name, name_bd, ensemble_model_name)
+        e.criar_Csv_models(estimators, name_bd, ensemble_model_name)
     else:
         print('[ERRO] Opcao invalida!')
             

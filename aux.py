@@ -5,7 +5,7 @@ from river import stream
 
 window_size=100
 def escolha_BD():
-    opcao= input("Digite o Dataset que deseja:\n1-SmsSpam\n2-Bananas\n3-CreditCard\n4-Elec2\n5-MaliciousURL\n6-Phishing\n7-SMTP\n8-Higgs\n9-TRE07\n10-HTTP\n")
+    opcao= input("Digite o Dataset que deseja:\n1-SmsSpam\n2-Bananas\n3-CreditCard\n4-Elec2\n5-MaliciousURL\n6-Phishing\n7-SMTP\n8-Higgs\n9-TRE07\n10-HTTP\n11-ConceptDrift\n")
     #opcao= input("Digite o Dataset que deseja:\n1-SmsSpam\n2-Bananas\n3-CreditCard\n4-Elec2\n5-MaliciousURL\n6-Phishing\n7-SMTP\n8-Higgs\n")
 
     #databases
@@ -51,7 +51,10 @@ def escolha_BD():
         name='HTTP'
     elif(opcao== '11'):
         local_dataset = '/home/arthur/river_data/dataset_Conceptdrift/dataset_Conceptdrift.csv'
-        dataset= stream.iter_csv(local_dataset)
+        #dataset= stream.iter_csv(local_dataset)
+        #dataset=pd.DataFrame(local_dataset)
+        dataset = pd.read_csv(local_dataset)
+        #dataset=local_dataset
         name='dataset_Conceptdrift'
     else:
         print("[ERRO]Opção inválida.")
@@ -146,3 +149,5 @@ def aux_TRE07(y_pred):
         return True
     else:
         return y_pred
+    
+

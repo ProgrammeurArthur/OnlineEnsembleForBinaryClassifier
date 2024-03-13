@@ -12,7 +12,7 @@ from pprint import pprint
 
 seed_aux=42
 
-def model_database(dataset):
+def model_database(dataset, name_dataset):
     if isinstance(dataset, datasets.SMSSpam):
         model =  compose.Select('body')
     elif isinstance(dataset, datasets.Bananas):
@@ -34,16 +34,17 @@ def model_database(dataset):
     elif isinstance(dataset, datasets.TREC07):
         #model =  compose.Select('body', 'date', 'recipients','sender','subject')
         return None #verificar
-    elif isinstance(dataset, synth.ConceptDriftStream):
-        model =  compose.Select('0','1','2','target')
+    elif (name_dataset=='dataset_Conceptdrift'):
+        model =  compose.Select('0','1','2')
+         
         
     return model
 
 
 
-def BernoulliNB(dataset):
+def BernoulliNB(dataset, name_dataset):
     if isinstance(dataset, datasets.SMSSpam):
-        model =  model_database(dataset)
+        model =  model_database(dataset, name_dataset)
         model |= (
         feature_extraction.TFIDF(on='body') |
         naive_bayes.BernoulliNB(alpha=0)
@@ -63,15 +64,15 @@ def BernoulliNB(dataset):
         naive_bayes.BernoulliNB(alpha=0)
         )
     else:
-        model =  model_database(dataset)
+        model =  model_database(dataset, name_dataset)
         model |= (
         preprocessing.StandardScaler() |
         naive_bayes.BernoulliNB(alpha=0)
         )
     return model
 
-def ARFClassifier(dataset):
-    model =  model_database(dataset)
+def ARFClassifier(dataset, name_bd):
+    model =  model_database(dataset, name_bd)
     if isinstance(dataset, (datasets.TREC07, datasets.MaliciousURL)):
         model= forest.ARFClassifier(seed=seed_aux, leaf_prediction="mc")
     else:
@@ -79,8 +80,8 @@ def ARFClassifier(dataset):
     
     return model
 
-def HardSamplingClassifier(dataset):
-    model=model_database(dataset)
+def HardSamplingClassifier(dataset,name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= (
         feature_extraction.TFIDF(on='body') |
@@ -119,8 +120,8 @@ def HardSamplingClassifier(dataset):
         )
     return model
 
-def RandomOverSampler(dataset):
-    model=model_database(dataset)
+def RandomOverSampler(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= imblearn.RandomOverSampler(
         (
@@ -158,8 +159,8 @@ def RandomOverSampler(dataset):
     )
     return model
 
-def RandomSampler(dataset):
-    model=model_database(dataset)
+def RandomSampler(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= imblearn.RandomSampler(
         (
@@ -200,8 +201,8 @@ def RandomSampler(dataset):
         )
     return model
 
-def RandomUnderSampler(dataset):
-    model=model_database(dataset)
+def RandomUnderSampler(dataset, name_dataset):
+    model=model_database(dataset,name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= imblearn.RandomUnderSampler(
             (
@@ -239,8 +240,8 @@ def RandomUnderSampler(dataset):
         )
     return model
 
-def LogisticRegression(dataset):
-    model=model_database(dataset)
+def LogisticRegression(dataset,name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= (
             feature_extraction.TFIDF(on='body') |
@@ -264,8 +265,8 @@ def LogisticRegression(dataset):
         )
     return model
 
-def Perceptron(dataset):
-    model=model_database(dataset)
+def Perceptron(dataset,name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= (feature_extraction.TFIDF(on='body')  | linear_model.Perceptron())
 
@@ -284,8 +285,8 @@ def Perceptron(dataset):
 
     return model
 
-def OneVsOneClassifier(dataset):
-    model=model_database(dataset)
+def OneVsOneClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model|= (feature_extraction.TFIDF(on='body')  |multiclass.OneVsOneClassifier(linear_model.LogisticRegression()))
 
@@ -304,8 +305,8 @@ def OneVsOneClassifier(dataset):
 
     return model
 
-def OneVsRestClassifier(dataset):
-    model=model_database(dataset)
+def OneVsRestClassifier(dataset,name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model|= (feature_extraction.TFIDF(on='body')  |multiclass.OneVsRestClassifier(linear_model.LogisticRegression()))
 
@@ -324,8 +325,8 @@ def OneVsRestClassifier(dataset):
 
     return model
 
-def OutputCodeClassifier(dataset):
-    model=model_database(dataset)
+def OutputCodeClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model|= (feature_extraction.TFIDF(on='body')  | multiclass.OutputCodeClassifier(
         classifier=linear_model.LogisticRegression(),
@@ -359,8 +360,8 @@ def OutputCodeClassifier(dataset):
 
     return model
 
-def tree_ExtremelyFastDecisionTreeClassifier(dataset):
-    model=model_database(dataset)
+def tree_ExtremelyFastDecisionTreeClassifier(dataset,name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= tree.ExtremelyFastDecisionTreeClassifier(
         grace_period=100,
@@ -401,8 +402,8 @@ def tree_ExtremelyFastDecisionTreeClassifier(dataset):
 
     return model
 
-def tree_HoeffdingAdaptiveTreeClassifier(dataset):
-    model=model_database(dataset)
+def tree_HoeffdingAdaptiveTreeClassifier(dataset,name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= tree.HoeffdingAdaptiveTreeClassifier(
         grace_period=100,
@@ -442,8 +443,8 @@ def tree_HoeffdingAdaptiveTreeClassifier(dataset):
 
     return model
 
-def tree_HoeffdingTreeClassifier(dataset):
-    model=model_database(dataset)
+def tree_HoeffdingTreeClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= tree.HoeffdingTreeClassifier(
         grace_period=100,
@@ -524,8 +525,8 @@ def tree_HoeffdingTreeClassifier(dataset):
 
 #     return model
 
-def ensemble_ADWINBaggingClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_ADWINBaggingClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
 
         model |= ensemble.ADWINBaggingClassifier(
@@ -567,8 +568,8 @@ def ensemble_ADWINBaggingClassifier(dataset):
         )
     return model
 
-def ensemble_ADWINBoostingClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_ADWINBoostingClassifier(dataset,name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= ensemble.ADWINBoostingClassifier(
         model=(
@@ -608,8 +609,8 @@ def ensemble_ADWINBoostingClassifier(dataset):
     )
     return model
 
-def ensemble_AdaBoostClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_AdaBoostClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= ensemble.AdaBoostClassifier(
         model=(
@@ -656,8 +657,8 @@ def ensemble_AdaBoostClassifier(dataset):
         )
     return model
 
-def ensemble_BOLEClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_BOLEClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= ensemble.BOLEClassifier(
         model=drift.DriftRetrainingClassifier(
@@ -695,8 +696,8 @@ def ensemble_BOLEClassifier(dataset):
         )
     return model
 
-def ensemble_BaggingClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_BaggingClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model = ensemble.BaggingClassifier(
         model=(
@@ -737,8 +738,8 @@ def ensemble_BaggingClassifier(dataset):
         )
     return model
 
-def ensemble_LeveragingBaggingClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_LeveragingBaggingClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model = ensemble.LeveragingBaggingClassifier(
             model=(
@@ -779,8 +780,8 @@ def ensemble_LeveragingBaggingClassifier(dataset):
         )
     return model
 
-def ensemble_SRPClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_SRPClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         base_model = tree.HoeffdingTreeClassifier(
         grace_period=100,
@@ -822,8 +823,8 @@ def ensemble_SRPClassifier(dataset):
         )
     return model
 
-def ensemble_StackingClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_StackingClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     list=list_models(dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= compose.Pipeline(
@@ -860,8 +861,8 @@ def ensemble_StackingClassifier(dataset):
         )
     return model
 
-def ensemble_VotingClassifier(dataset):
-    model=model_database(dataset)
+def ensemble_VotingClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= (
             feature_extraction.TFIDF(on='body')|
@@ -900,8 +901,8 @@ def ensemble_VotingClassifier(dataset):
         )
     return model
 
-def forest_AMFClassifier(dataset):
-    model=model_database(dataset)
+def forest_AMFClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model|=(feature_extraction.TFIDF(on='body')|
             preprocessing.StandardScaler() |
@@ -937,8 +938,8 @@ def forest_AMFClassifier(dataset):
         ))
     return model
 
-def linear_model_ALMAClassifier(dataset):
-    model=model_database(dataset)
+def linear_model_ALMAClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model |= (
         feature_extraction.TFIDF(on='body')|
@@ -965,8 +966,8 @@ def linear_model_ALMAClassifier(dataset):
         )
     return model
 
-def linear_model_PAClassifier(dataset):
-    model=model_database(dataset)
+def linear_model_PAClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):
         model = (
             feature_extraction.TFIDF(on='body')|
@@ -999,8 +1000,8 @@ def linear_model_PAClassifier(dataset):
         ))
     return model
 
-def linear_model_SoftmaxRegression(dataset):
-    model=model_database(dataset)
+def linear_model_SoftmaxRegression(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):               
         model |= feature_extraction.TFIDF(on='body')
         model |= preprocessing.StandardScaler()
@@ -1019,8 +1020,8 @@ def linear_model_SoftmaxRegression(dataset):
         model |= linear_model.SoftmaxRegression()
     return model
 
-def naive_bayes_ComplementNB(dataset):
-    model=model_database(dataset)
+def naive_bayes_ComplementNB(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):               
         model |= compose.Pipeline(
             (feature_extraction.TFIDF(on='body')),
@@ -1044,8 +1045,8 @@ def naive_bayes_ComplementNB(dataset):
         )
     return model
 
-def naive_bayes_GaussianNB(dataset):
-    model=model_database(dataset)
+def naive_bayes_GaussianNB(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):               
         model |= feature_extraction.TFIDF(on='body')
         model |= naive_bayes.GaussianNB()
@@ -1062,8 +1063,8 @@ def naive_bayes_GaussianNB(dataset):
         model |= naive_bayes.GaussianNB()
     return model
 
-def naive_bayes_MultinomialNB(dataset):
-    model=model_database(dataset)
+def naive_bayes_MultinomialNB(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):               
         model |= compose.Pipeline(
             ("tfidf", feature_extraction.TFIDF(on='body')),
@@ -1090,8 +1091,8 @@ def naive_bayes_MultinomialNB(dataset):
         )
     return model
 
-def neighbors_KNNClassifier(dataset):
-    model=model_database(dataset)
+def neighbors_KNNClassifier(dataset, name_dataset):
+    model=model_database(dataset, name_dataset)
     if isinstance(dataset, datasets.SMSSpam):               
         l1_dist = functools.partial(utils.math.minkowski_distance, p=1)
         model |= (feature_extraction.TFIDF(on='body')|
