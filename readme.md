@@ -1,1 +1,3 @@
-<iframe src="monografia/Monografia_ensemble.pdf" width="100%" height="600px"></iframe>
+# 📚 Monografia
+
+Para visualizar o documento completo da monografia, [**clique aqui**](monografia/Monografia_ensemble.pdf).
